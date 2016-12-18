@@ -2,7 +2,7 @@
 
 A random picture quote every time you visit!
 
-**[Try it out online ☞ Mondrian Generator](http://jefworks.github.io/picture-quote-generator/)**
+**[Try it out online ☞ Picture Quote Generator](http://jefworks.github.io/picture-quote-generator/)**
 
 Random quote using the [Quotes on Design API](https://quotesondesign.com/api-v4-0/). Words from quote are then used as keywords to get a random image using the [Flickr API](https://www.flickr.com/services/api/). Random font is also chosen from [Google Fonts](https://fonts.google.com/). 
 
