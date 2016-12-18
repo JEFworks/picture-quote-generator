@@ -4,7 +4,7 @@ A random picture quote every time you visit!
 
 **[Try it out online ☞ Picture Quote Generator](http://jefworks.github.io/picture-quote-generator/)**
 
-Random quote using the [Quotes on Design API](https://quotesondesign.com/api-v4-0/). Words from quote are then used as keywords to get a random image using the [Flickr API](https://www.flickr.com/services/api/). Random font is also chosen from [Google Fonts](https://fonts.google.com/). 
+Random quote using the [Quotes on Design API](https://quotesondesign.com/api-v4-0/). Words from quote are then used as keywords to get a random image using the [Flickr API](https://www.flickr.com/services/api/). Random font is also chosen from [Google Fonts](https://fonts.google.com/). Scripts were developed as part of an Introduction to Computer Science for 5th to 8th grade girls class I'm putting together and teaching in order to show students how computer science can be used in, other perhaps less obvious and conventional, ways that are only limited by your imagination.
 
 Sample random picture quotes generated:
 ![](images/pq_1.png)
