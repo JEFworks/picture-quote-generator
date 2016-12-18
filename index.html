@@ -1,0 +1,192 @@
+<html>
+
+    <head>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+	<script type="text/javascript">
+
+	 // random quote using quotes on design api	 
+	 function randomQuote() {
+	     $.ajax( {
+		 url: 'http://quotesondesign.com/wp-json/posts?filter[orderby]=rand&filter[posts_per_page]=1',
+		 success: function(data) {
+		     var post = data.shift(); // The data is an array of posts. Grab the first one.
+		     $('#quote-title').text(post.title);
+		     $('#quote-content').html(post.content);
+		     // use 4 longest words as keywords for getting image
+		     var keyword = post.content.replace('<p>', '').replace('</p>', '').split(' ').sort(function(a, b){
+			 return b.length - a.length;
+		     });
+		     keyword = keyword.slice(1,5).join(",") 
+		     console.log(keyword)
+		     randomBackground(keyword)
+		 },
+		 cache: false
+	     });
+	 }
+	 
+	 // random background using flickr api
+	 function randomBackground(keyword) {
+	     $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?",
+		       {
+			   tags: keyword,
+			   tagmode: "any",
+			   format: "json"
+		       },
+		       function(data) {
+			   var rnd = Math.floor(Math.random() * data.items.length);
+			   
+			   var image_src = data.items[rnd]['media']['m'].replace("_m", "_b");
+			   
+			   $('body').css('background-image', "url('" + image_src + "')");
+			   $('body').css('background-size', "cover");
+			   $('body').css('background-position', "center");
+			   
+		   }
+	     );
+	 }
+	 
+	</script>
+	
+	<!-- random font; courtesy of http://codepen.io/katydecorah/pen/vetCA -->
+	<script type="text/javascript">
+	 var url ="https://www.googleapis.com/webfonts/v1/webfonts?key=AIzaSyDK4Jz71F7DQCrUhXYaF3xgEXoQGLDk5iE";
+	 var family = "";
+	 runFont(family);
+	 var families = [];
+	 var visited = [];
+
+	 $.getJSON(url,function(json){
+	     // counts all the families
+	     var countFamilies = json.items.length;
+	     $("#count").text(countFamilies);
+
+	     // pushes all the font families to an array
+	     $.each(json.items,function(i,type){
+		 families.push(type.family);
+	     });
+	 });
+
+	 // Gets the font based on family name
+	 function runFont(family) {
+	     $.getJSON(url,function(json){
+		 $.each(json.items,function(i,type){
+		     if (type.family === family) {
+			 var familyPlus = family.replace(/\s/g, '+');
+			 var familyCSS = "http://fonts.googleapis.com/css?family=" + familyPlus + ":" + type.variants + "";
+			 var details = $("#variants");
+
+			 // Removes previous family and style
+			 $(".style").remove();
+			 $("style").remove();
+			 details.empty();
+
+			 // Grabs family details
+			 details.append("<div class='detail-title'>Variants</div><ul class='list-variant'></ul>");
+			 $(type.variants).each(function(index, item) {
+			     $(".list-variant").append(
+				 $(document.createElement('li')).text(item)
+			     );
+			 });
+			 details.append("<div class='detail-title'>Subsets</div><ul class='list-subsets'></ul>");
+			 $(type.subsets).each(function(index, item) {
+			     $(".list-subsets").append(
+				 $(document.createElement('li')).text(item)
+			     );
+			 });
+			 details.append("<div class='detail-title horizontal'>Version</div><div class='detail-data'>" + type.version + "</div>");
+			 details.append("<div class='detail-title horizontal'>Last Modified</div><div class='detail-data'>" + type.lastModified + "</div>");
+			 details.append("<div class='detail-title'>HTML</div><div class='detail-data'><pre><code class='language-markup'>&lt;link href='"+familyCSS+"' rel='stylesheet' type='text/css'&gt;</code></pre></div>");
+			 details.append("<div class='detail-title'>CSS</div><div class='detail-data'><pre><code class='language-css'>font-family: '"+family+"', sans-serif;</code></pre></div>");
+			 details.append("<a href='http://www.google.com/fonts#UsePlace:use/Collection:"+familyPlus+"' class='btn'>View on Google Fonts &rarr;</a>");
+
+			 // Grabs the Google Font
+			 $("head").append("<link href='"+ familyCSS +"' rel='stylesheet' type='text/css' class='style'>");
+			 $("body").css("font-family",family);
+
+			 // If family has italic or bold, allow it
+			 if(details.text().match('italic')){
+			     $("head").append("<style>.main em { font-style: italic; }");
+			 }
+			 if(details.text().match('700')){
+			     $("head").append("<style>.main strong,h1,h2,h3 { font-weight: 700; }");
+			 }
+			 else if(details.text().match('800')){
+			     $("head").append("<style>.main strong,h1,h2,h3 { font-weight: 800; }");
+			 }
+			 else if(details.text().match('900')){
+			     $("head").append("<style>.main strong,h1,h2,h3 { font-weight: 900; }");
+			 }
+
+			 // Save visited families
+			 visited.push( family );
+			 var visit="";
+			 $.each(visited, function(i, val) {
+			     visit+= "<li class='link-history' data-family='"+ val +"'>" + val + "</li>";
+			 });
+			 $('#visited').html(visit);
+
+			 // Creates link to view that font again
+			 $(".link-history").click(function(){
+			     var dat = $(this).attr("data-family");
+			     runFont(dat);
+			     $("#font-search").attr("placeholder",dat);
+
+			     // remove first instance from array
+			     if ($.inArray(dat, visited) !== -1) {
+				 visited.splice( $.inArray(dat, visited), 1 );
+			     }
+			 });
+
+		     }
+		 });
+	     });
+	 }
+
+
+	 // Gets a random font
+	 function randomFont() {
+	     $.getJSON(url,function(json){
+		 var count = json.items.length,
+		     random = Math.ceil(Math.random() * count);
+		 $.each(json.items,function(i,type){
+		     if(i === random){
+			 var family = type.family;
+			 $("#font-search").attr("placeholder", family);
+			 runFont(family);
+		     }
+		 });
+	     });
+	 }
+
+	 // Runs to fetch random stuff
+	 $( document ).ready(function() {
+	     randomFont();
+	     randomQuote(); // calls randomBackground
+	 });
+	     
+	</script>	
+    </head>
+
+    <body>
+	<!-- fork me on github banner -->
+	<a href="https://github.com/JEFworks/picture-quote-generator"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/365986a132ccd6a44c23a9169022c0b5c890c387/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f7265645f6161303030302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"></a>
+	
+	<!-- center align -->
+	<div style="position: relative; width: 100%; height: 100%;">
+	    <div style="background-color: rgba(255,255,255,0.75);
+			padding: 30px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			">
+		<h1>
+		    <span id="quote-content"></span>
+		    - <span id="quote-title"></span>
+		</h1>
+	    </div>
+	    
+	</div>
+    </body>
+</html>
